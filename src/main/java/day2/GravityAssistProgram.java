@@ -1,3 +1,5 @@
+package day2;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,7 +11,7 @@ import java.util.stream.Collectors;
 public class GravityAssistProgram {
 
     public static void main(String args[]) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(FuelCalculator.class.getResourceAsStream("gravity-assist.txt")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(GravityAssistProgram.class.getResourceAsStream("../day2_input.txt")));
 
         String line = reader.readLine();
 
@@ -23,20 +25,21 @@ public class GravityAssistProgram {
             for(int j=0; j<100; ++j) {
 
                 List<Integer> freshMem = new ArrayList<>(memory);
-                memory.set(1, i);
-                memory.set(2, j);
+                freshMem.set(1, i);
+                freshMem.set(2, j);
 
-                System.out.println("Trying with i,j : " + memory.get(1) + "," +memory.get(2));
+                System.out.println("Trying with i,j : " + freshMem.get(1) + "," +freshMem.get(2));
+                System.out.println(freshMem.get(0) +"," + freshMem.get(1) + "," + freshMem.get(2)+ "," + freshMem.get(3));
 
                 for(int k=0; k<freshMem.size(); k+=4) {
                     if(!performOperation(k, freshMem)) {
                         break;
                     }
                 }
-                System.out.println("Value at 0: " + memory.get(0));
-                if(memory.get(0) == 19690720) {
-                    System.out.println("verb: " + i + " noun: " + j);
-                    break;
+                System.out.println("Value at 0: " + freshMem.get(0));
+                if(freshMem.get(0) == 19690720) {
+                    System.out.println("Noun: " + i + " Verb: " + j);
+                    return;
                 }
             }
         }

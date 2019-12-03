@@ -1,9 +1,13 @@
-import java.io.*;
+package day1;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 class FuelCalculator {
 
     public static void main(String args[]) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(FuelCalculator.class.getResourceAsStream("input.txt")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(FuelCalculator.class.getResourceAsStream("../day1_input.txt")));
         int mass, total = 0;
         while(reader.ready()){
             mass = Integer.parseInt(reader.readLine());
