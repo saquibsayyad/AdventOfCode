@@ -1,67 +1,72 @@
-package day2;
+package day2
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
+import java.util.ArrayList
+import java.util.Arrays
+import java.util.stream.Collectors
 
-public class GravityAssistProgram {
+object GravityAssistProgram {
 
-    public static void main(String args[]) throws IOException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(GravityAssistProgram.class.getResourceAsStream("../day2_input.txt")));
+    @Throws(IOException::class)
+    @JvmStatic
+    fun main(args: Array<String>) {
+        val reader = BufferedReader(InputStreamReader(GravityAssistProgram::class.java!!.getResourceAsStream("../day2_input.txt")))
 
-        String line = reader.readLine();
+        val line = reader.readLine()
 
-        List<Integer> memory = Arrays.asList(line.split(","))
+        val memory = Arrays.asList<String>(*line.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray())
                 .stream()
-                .map(c -> Integer.parseInt(c))
-                .collect(Collectors.toList());
+                .map { c -> Integer.parseInt(c) }
+                .collect<List<Int>, Any>(Collectors.toList())
 
 
-        for(int i=0; i<100; ++i) {
-            for(int j=0; j<100; ++j) {
+        for (i in 0..99) {
+            for (j in 0..99) {
 
-                List<Integer> freshMem = new ArrayList<>(memory);
-                freshMem.set(1, i);
-                freshMem.set(2, j);
+                val freshMem = ArrayList(memory)
+                freshMem[1] = i
+                freshMem[2] = j
 
-                System.out.println("Trying with i,j : " + freshMem.get(1) + "," +freshMem.get(2));
-                System.out.println(freshMem.get(0) +"," + freshMem.get(1) + "," + freshMem.get(2)+ "," + freshMem.get(3));
+                println("Trying with i,j : " + freshMem[1] + "," + freshMem[2])
+                println(freshMem[0].toString() + "," + freshMem[1] + "," + freshMem[2] + "," + freshMem[3])
 
-                for(int k=0; k<freshMem.size(); k+=4) {
-                    if(!performOperation(k, freshMem)) {
-                        break;
+                var k = 0
+                while (k < freshMem.size) {
+                    if (!performOperation(k, freshMem)) {
+                        break
                     }
+                    k += 4
                 }
-                System.out.println("Value at 0: " + freshMem.get(0));
-                if(freshMem.get(0) == 19690720) {
-                    System.out.println("Noun: " + i + " Verb: " + j);
-                    return;
+                println("Value at 0: " + freshMem[0])
+                if (freshMem[0] == 19690720) {
+                    println("Noun: $i Verb: $j")
+                    return
                 }
             }
         }
     }
 
 
-    private static boolean performOperation(int pos, List<Integer> memory) {
+    private fun performOperation(pos: Int, memory: MutableList<Int>): Boolean {
 
-        switch (memory.get(pos)) {
-            case 1:
-                memory.set( memory.get(pos + 3), memory.get(memory.get(pos + 1)) + memory.get(memory.get(pos + 2)));
-                System.out.println(memory.get(pos) +"," + memory.get(pos + 1) + "," + memory.get(pos + 2)+ "," + memory.get(pos + 3));
-                return true;
-            case 2:
-                memory.set( memory.get(pos + 3), memory.get(memory.get(pos + 1)) * memory.get(memory.get(pos + 2)));
-                System.out.println(memory.get(pos) +"," + memory.get(pos + 1) + "," + memory.get(pos + 2)+ "," + memory.get(pos + 3));
-                return true;
-            case 99:
-                return false;
-            default:
-                System.out.println("Fatal error!! Opcode is " + memory.get(pos));
-                return false;
+        when (memory[pos]) {
+            1 -> {
+                memory[memory[pos + 3]] = memory[memory[pos + 1]] + memory[memory[pos + 2]]
+                println(memory[pos].toString() + "," + memory[pos + 1] + "," + memory[pos + 2] + "," + memory[pos + 3])
+                return true
+            }
+            2 -> {
+                memory[memory[pos + 3]] = memory[memory[pos + 1]] * memory[memory[pos + 2]]
+                println(memory[pos].toString() + "," + memory[pos + 1] + "," + memory[pos + 2] + "," + memory[pos + 3])
+                return true
+            }
+            99 -> return false
+            else -> {
+                println("Fatal error!! Opcode is " + memory[pos])
+                return false
+            }
         }
 
     }
