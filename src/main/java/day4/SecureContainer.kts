@@ -1,6 +1,4 @@
-
-
-
+import kotlin.test.assertEquals
 
 
 fun validatePassword(password: String): Boolean {
@@ -31,12 +29,47 @@ fun validatePassword(password: String): Boolean {
     return true
 }
 
-var cnt = 0
-for (x in 246540 until 787419) {
-    if(validatePassword(x.toString())) cnt++
+fun twoAdjacentNotPartofLargeGroup(password: String): Boolean {
+
+    var counts: HashMap<String, Int?> = hashMapOf( "0" to 0,
+            "1" to 0,
+            "2" to 0,
+            "3" to 0,
+            "4" to 0,
+            "5" to 0,
+            "6" to 0,
+            "7" to 0,
+            "8" to 0,
+            "9" to 0
+            )
+
+    for (x in password){
+        counts[x.toString()] = counts[x.toString()]?.plus(1)
+    }
+
+    for ( x in counts.values) {
+        if ( x == 2)
+            return true
+    }
+    return false
 }
 
-println(cnt)
+var cntPart1 =0
+var cntPart2 = 0
 
+for (x in 246540 until 787419) {
+    if(validatePassword(x.toString())){
+        cntPart1++
 
-//print(validatePassword("111122"))
+        if (twoAdjacentNotPartofLargeGroup(x.toString())) {
+            cntPart2++
+        }
+
+    }
+}
+
+// part 1
+println(cntPart1)
+
+// part 2
+println(cntPart2)
