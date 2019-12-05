@@ -77,6 +77,10 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
     val operation = getOperation(opcode.toString()) // 1,2,3,4,99 etc
     val modes = getModes(opcode.toString()) // {A: P/I, B: P/I, C:P/I}
 
+
+    println("opcode $opcode - mode $modes")
+    println(mem)
+
     when(operation) {
         1 -> {
             val a = getVal(pointer + 1, modes["A"], mem)
@@ -103,6 +107,56 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
             return pointer + 2
         }
 
+        5 -> {
+            val a = getVal(pointer + 1, modes["A"], mem)
+            val b = getVal(pointer + 2, modes["B"], mem)
+
+            return if(a != 0)
+                b
+            else
+                pointer + 1
+        }
+
+        6 -> {
+            val a = getVal(pointer + 1, modes["A"], mem)
+            val b = getVal(pointer + 2, modes["B"], mem)
+
+            return if(a == 0)
+                b
+            else
+                pointer + 2
+
+        }
+
+        7 -> {
+            val a = getVal(pointer + 1, modes["A"], mem)
+            val b = getVal(pointer + 2, modes["B"], mem)
+
+            if (a < b) {
+                mem[mem[pointer + 3]] = 1
+            }else {
+                mem[mem[pointer + 3]] = 0
+            }
+
+            return pointer + 2
+        }
+
+        8 -> {
+            val a = getVal(pointer + 1, modes["A"], mem)
+            val b = getVal(pointer + 2, modes["B"], mem)
+
+            if (a == b) {
+                mem[mem[pointer + 3]] = 1
+            }else {
+                mem[mem[pointer + 3]] = 0
+            }
+
+            if(mem[pointer + 1] == mem[mem[pointer + 3]]) // if pointer values gets overriden, donnt increment
+                return pointer
+            else
+                return pointer + 4
+        }
+
         else -> {
             return pointer + 1
         }
@@ -111,7 +165,9 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
 }
 
 
-var mem = loadInstructions("day5_input.txt")
+//var mem = loadInstructions("day5_input.txt")
+
+var mem = "3,3,1108,-1,8,3,4,3,99".split(",").map { t -> t.toInt() }.toMutableList()
 var pointer = 0
 while(pointer < mem.size && mem[pointer] != 99) {
     pointer = exec(pointer, mem)
