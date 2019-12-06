@@ -1,7 +1,10 @@
+package day5
+
 import java.io.File
 import java.util.*
 
-fun loadInstructions(filename: String) = File(filename).readText().split(",").map { t -> t.toInt() }.toMutableList()
+fun loadInstructions(filename: String) = File(ClassLoader.getSystemResource(filename).file).readText().split(",").map { t -> t.toInt() }.toMutableList()
+
 
 enum class Mode {
     IMMEDIATE,
@@ -9,7 +12,7 @@ enum class Mode {
 }
 
 fun normalizeOpCode(op: String): String {
-    return "0".repeat(5 -op.length) + op
+    return "0".repeat(5 - op.length) + op
 }
 
 fun getOperation(opcode: String): Int {
@@ -37,13 +40,11 @@ fun getModes(opcode: String): Map<String, Mode> {
             map.put("C", Mode.POSITIONAL)
         }
 
-
         if( op[1] == '1') {
             map.put("B", Mode.IMMEDIATE)
         }else {
             map.put("B", Mode.POSITIONAL)
         }
-
 
         if( op[2] == '1') {
             map.put("A", Mode.IMMEDIATE)
@@ -51,8 +52,6 @@ fun getModes(opcode: String): Map<String, Mode> {
             map.put("A", Mode.POSITIONAL)
         }
 
-    } else {
-        print("") // works as getVal defaults to position
     }
 
     return map
@@ -67,6 +66,14 @@ fun getVal(pos: Int, mode: Mode?, mem: MutableList<Int>): Int {
     }
 }
 
+fun setVal(pos: Int,mode:Mode?, mem: MutableList<Int>, value: Int) {
+    if(mode == Mode.IMMEDIATE) {
+        mem[pos] = value
+    } else {
+        mem[mem[pos]] = value;
+    }
+}
+
 
 fun exec(pointer: Int, mem: MutableList<Int>) : Int {
 
@@ -78,8 +85,8 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
     val modes = getModes(opcode.toString()) // {A: P/I, B: P/I, C:P/I}
 
 
-    println("opcode $opcode - mode $modes")
-    println(mem)
+//    println("opcode $opcode - mode $modes")
+//    println(mem)
 
     when(operation) {
         1 -> {
@@ -114,7 +121,7 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
             return if(a != 0)
                 b
             else
-                pointer + 1
+                pointer + 3
         }
 
         6 -> {
@@ -124,7 +131,7 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
             return if(a == 0)
                 b
             else
-                pointer + 2
+                pointer + 3
 
         }
 
@@ -133,12 +140,15 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
             val b = getVal(pointer + 2, modes["B"], mem)
 
             if (a < b) {
-                mem[mem[pointer + 3]] = 1
+                setVal(pointer + 3, modes["C"], mem, 1)
             }else {
-                mem[mem[pointer + 3]] = 0
+                setVal(pointer + 3, modes["C"], mem, 0)
             }
 
-            return pointer + 2
+            if(mem[pointer] == mem[mem[pointer + 3]]) // if pointer values gets overriden, donnt increment
+                return pointer
+            else
+                return pointer + 4
         }
 
         8 -> {
@@ -146,12 +156,12 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
             val b = getVal(pointer + 2, modes["B"], mem)
 
             if (a == b) {
-                mem[mem[pointer + 3]] = 1
+                setVal(pointer + 3, modes["C"], mem, 1)
             }else {
-                mem[mem[pointer + 3]] = 0
+                setVal(pointer + 3, modes["C"], mem, 0)
             }
 
-            if(mem[pointer + 1] == mem[mem[pointer + 3]]) // if pointer values gets overriden, donnt increment
+            if((modes["C"] == Mode.IMMEDIATE && pointer == mem[pointer + 3]) || (modes["C"] == Mode.POSITIONAL && pointer == mem[mem[pointer + 3]])) // if pointer values gets overriden, donnt increment
                 return pointer
             else
                 return pointer + 4
@@ -165,10 +175,12 @@ fun exec(pointer: Int, mem: MutableList<Int>) : Int {
 }
 
 
-//var mem = loadInstructions("day5_input.txt")
+fun main() {
+    var mem = loadInstructions("./day5_input.txt")
 
-var mem = "3,3,1108,-1,8,3,4,3,99".split(",").map { t -> t.toInt() }.toMutableList()
-var pointer = 0
-while(pointer < mem.size && mem[pointer] != 99) {
-    pointer = exec(pointer, mem)
+//    var mem = "3,3,1107,-1,8,3,4,3,99".split(",").map { t -> t.toInt() }.toMutableList()
+    var pointer = 0
+    while(pointer < mem.size && mem[pointer] != 99) {
+        pointer = exec(pointer, mem)
+    }
 }
