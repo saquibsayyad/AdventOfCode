@@ -29,17 +29,14 @@ fun validatePassword(password: String): Boolean {
 
 fun twoAdjacentNotPartofLargeGroup(password: String): Boolean {
 
-    var counts: HashMap<String, Int?> = hashMapOf( "0" to 0,
-            "1" to 0,
-            "2" to 0,
-            "3" to 0,
-            "4" to 0,
-            "5" to 0,
-            "6" to 0,
-            "7" to 0,
-            "8" to 0,
-            "9" to 0
-            )
+    var counts: HashMap<String, Int?> = hashMapOf()
+
+
+    password.fold(mutableMapOf()) { acc: MutableMap<Char, Int>, char: Char ->
+        val count = acc[char]
+        acc[char] = count?.let { it + 1 } ?: 0
+        acc
+    }
 
     for (x in password){
         counts[x.toString()] = counts[x.toString()]?.plus(1)
