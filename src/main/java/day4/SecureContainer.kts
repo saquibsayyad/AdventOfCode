@@ -1,5 +1,3 @@
-import kotlin.test.assertEquals
-
 
 fun validatePassword(password: String): Boolean {
 
